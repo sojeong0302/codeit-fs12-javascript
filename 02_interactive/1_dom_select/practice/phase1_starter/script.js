@@ -6,9 +6,24 @@
 // 힌트: document.getElementById('app-title')로 선택 후 .textContent 사용
 // 여기에 코드를 작성하세요 ↓
 
+const appTitle = document.getElementById("app-title");
+appTitle.textContent = "my todo list";
+
 // 미션 ② app-subtitle 텍스트 바꾸기
+
+const appSubtitle = document.getElementById("app-subtitle");
+appSubtitle.textContent = "삶이란 미로 때론 헤매도 이 자체로 소중한걸";
 
 // 미션 ③ remaining-count 숫자를 3으로 바꾸기
 
+const remainingCount = document.getElementById("remaining-count");
+remainingCount.textContent = 3;
+
 // 미션 ④ todo-list 요소를 콘솔에 출력하기
 // 힌트: console.log()를 사용하세요
+
+const todoList = document.getElementsByClassName("todo-list");
+
+for (let i = 0; i < todoList.length; i++) {
+  console.log(todoList[i].textContent);
+}
