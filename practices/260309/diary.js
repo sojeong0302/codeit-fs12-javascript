@@ -183,7 +183,7 @@ function renderEntry(entry) {
 }
 
 // 4-2. 전체 일기 목록 그리기
-function renderAllEntries() {
+function renderAllEntries(mood) {
   // TODO: diary 배열의 모든 일기를 화면에 그리세요
   //
   // 단계:
@@ -210,6 +210,18 @@ function renderAllEntries() {
   diary.forEach(function (t) {
     diaryList.appendChild(renderEntry(t));
   });
+
+  //도전 과제 2번
+  if (mood) {
+    const result = diary.filter(function (t) {
+      return t.mood.includes(mood) || t.mood.includes(mood);
+    });
+    return result;
+  }
+
+  //도전 과제 3번
+  const title = document.createElement("h2");
+  title.textContent = `일기 목록 ${diary.length}`;
 
   //통계 안나와서 추가함
   renderStats();
@@ -480,7 +492,7 @@ function renderStats() {
 //
 // 1. getEntriesByKeyword(keyword)
 //    - 제목이나 내용에 keyword가 포함된 일기를 찾아 반환
-//    - 힌트: filter() + includes()
+//    - 힌트: filter() + inclucdes()
 //
 // 2. renderAllEntries를 수정해서 특정 mood만 필터링 가능하게 만들기
 //    - 예: renderAllEntries('happy') → 행복한 일기만 표시
@@ -489,3 +501,11 @@ function renderStats() {
 // 3. 일기 개수를 헤더 제목 옆에 실시간으로 표시하기
 //    - 예: "일기 목록 (3)"
 //    - 힌트: renderAllEntries 안에서 h2의 textContent 수정
+
+//1번
+function getEntriesByKeyword(keyword) {
+  const result = diary.filter(function (t) {
+    return t.title.includes(keyword) || t.content.includes(keyword);
+  });
+  return result;
+}
