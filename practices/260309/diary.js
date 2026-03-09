@@ -21,14 +21,14 @@ const MOOD_EMOJIS = {
 // 괄호 안에 CSS 선택자(id는 '#이름', class는 '.이름')를 넣으면 됩니다.
 
 // TODO: 각 변수에 알맞은 요소를 선택하세요
-const diaryForm = null; // 힌트: '#diary-form'
-const titleInput = null; // 힌트: '#title-input'
-const contentInput = null; // 힌트: '#content-input'
-const moodSelect = null; // 힌트: '#mood-select'
-const submitBtn = null; // 힌트: '#submit-btn'
-const diaryList = null; // 힌트: '#diary-list'
-const emptyMessage = null; // 힌트: '#empty-message'
-const statsContainer = null; // 힌트: '#stats'
+const diaryForm = document.querySelector("#diary-form"); // 힌트: '#diary-form'
+const titleInput = document.querySelector("#title-input"); // 힌트: '#title-input'
+const contentInput = document.querySelector("#content-input"); // 힌트: '#content-input'
+const moodSelect = document.querySelector("#mood-select"); // 힌트: '#mood-select'
+const submitBtn = document.querySelector("#submit-btn"); // 힌트: '#submit-btn'
+const diaryList = document.querySelector("#diary-list"); // 힌트: '#diary-list'
+const emptyMessage = document.querySelector("#empty-message"); // 힌트: '#empty-message'
+const statsContainer = document.querySelector("#stats"); // 힌트: '#stats'
 
 // ============================================
 // Part 2: 데이터 구조 만들기
@@ -44,7 +44,7 @@ const statsContainer = null; // 힌트: '#stats'
 // }
 
 // TODO: 빈 일기장 배열을 선언하세요
-let diary;
+let diary = [];
 
 // 일기 ID를 자동으로 증가시키기 위한 변수 (제공됨)
 let nextId = 1;
@@ -69,6 +69,14 @@ function addEntry(title, content, mood) {
   // 3. nextId를 1 증가시키세요
   //
   // 힌트: 배열 끝에 요소를 추가하는 메서드는?
+
+  diary.push({
+    id: nextId++,
+    date: new Date().toISOString().slice(0, 10),
+    title: title,
+    content: content,
+    mood: mood,
+  });
 }
 
 // ============================================
@@ -112,6 +120,66 @@ function renderEntry(entry) {
   // 8. 컨테이너를 return
   //
   // 힌트: createElement, textContent, className, appendChild, addEventListener
+
+  //1번
+  const div = document.createElement("div");
+  div.className = "entry";
+
+  //2번
+  const header = document.createElement("header");
+  header.className = "entry-header";
+
+  const mood = document.createElement("span");
+  mood.className = "entry-mood";
+  mood.textContent = MOOD_EMOJIS[entry.mood];
+
+  const title = document.createElement("h3");
+  title.className = "entry-title";
+  title.textContent = entry.title;
+
+  const date = document.createElement("span");
+  date.className = "entry-date";
+  date.textContent = entry.date;
+
+  header.appendChild(mood);
+  header.appendChild(title);
+  header.appendChild(date);
+
+  //3번
+  const content = document.createElement("P");
+  content.textContent = entry.content;
+
+  //4번
+  const button = document.createElement("div");
+  button.className = "entry-actions";
+
+  const editBtn = document.createElement("button");
+  editBtn.className = "edit-btn";
+  editBtn.textContent = "수정";
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.textContent = "삭제";
+
+  button.appendChild(editBtn);
+  button.appendChild(deleteBtn);
+
+  //5번
+  editBtn.addEventListener("click", function () {
+    fillFormForEdit(entry.id);
+  });
+  //6번
+  deleteBtn.addEventListener("click", function () {
+    deleteEntry(entry.id);
+  });
+
+  //7번
+  div.appendChild(header);
+  div.appendChild(content);
+  div.appendChild(button);
+
+  //8번
+  return div;
 }
 
 // 4-2. 전체 일기 목록 그리기
@@ -127,6 +195,24 @@ function renderAllEntries() {
   //    반환된 요소를 diaryList에 appendChild하세요
   //
   // 힌트: forEach로 순회, appendChild로 추가
+
+  //1번
+  diaryList.innerHTML = "";
+
+  //2번
+  if (diary.length === 0) {
+    emptyMessage.style.display = "block";
+  } else {
+    emptyMessage.style.display = "none";
+  }
+
+  //3번
+  diary.forEach(function (t) {
+    diaryList.appendChild(renderEntry(t));
+  });
+
+  //통계 안나와서 추가함
+  renderStats();
 }
 
 // ============================================
@@ -144,6 +230,16 @@ function updateEntry(id, updates) {
   //     → id가 1인 일기의 title과 mood만 변경
   //
   // 힌트: find()로 찾고, Object.assign()으로 속성 복사
+
+  //1번
+  const index = diary.find(function (t) {
+    return t.id === id;
+  });
+
+  //2번
+  if (index) {
+    Object.assign(index, updates);
+  }
 }
 
 // 5-2. 수정할 일기를 폼에 채우기
@@ -161,6 +257,25 @@ function fillFormForEdit(id) {
   // 5. submitBtn.textContent = '수정 완료' (버튼 텍스트 변경)
   //
   // 힌트: DOM 요소의 .value 속성에 값을 넣으면 입력칸에 표시됩니다
+
+  //1번
+  diary.find(function (t) {
+    //3번
+    if (diary.id === id) {
+      diary.titleInput.value(diary.title);
+      diary.contentInput.value(diary.content);
+      diary.moodSelect.value(diary.mood);
+    } else {
+      //2번
+      return;
+    }
+  });
+
+  //4번
+  editingId = id;
+
+  //5번
+  submitBtn.textContent = "수정 완료";
 }
 
 // ============================================
@@ -176,6 +291,19 @@ function deleteEntry(id) {
   // 3. renderAllEntries()를 호출해서 화면을 갱신하세요
   //
   // 힌트: findIndex()로 인덱스 찾기, splice()로 제거
+
+  //1번
+  const index = diary.findIndex(function (t) {
+    //2번
+    return id === t.id;
+  });
+
+  if (index !== -1) {
+    diary.splice(index, 1);
+  }
+
+  //3번
+  renderAllEntries();
 }
 
 // ============================================
@@ -192,6 +320,21 @@ function clearForm() {
   // 3. moodSelect.selectedIndex = 0 (첫 번째 옵션으로)
   // 4. editingId = null (추가 모드로 복귀)
   // 5. submitBtn.textContent = '일기 추가' (버튼 텍스트 복원)
+
+  //1번
+  titleInput.value = "";
+
+  //2번
+  contentInput.value = "";
+
+  //3번
+  moodSelect.selectedIndex = 0;
+
+  //4번
+  editingId = null;
+
+  //5번
+  submitBtn.textContent = "일기 추가";
 }
 
 // 7-2. 폼 제출 처리
@@ -209,6 +352,27 @@ function handleSubmit(e) {
   //    else → addEntry(title, content, mood)
   // 4. clearForm()으로 폼 초기화
   // 5. renderAllEntries()로 화면 갱신
+
+  //1번
+  e.preventDefault();
+
+  //2번
+  const title = titleInput.value;
+  const content = contentInput.value;
+  const mood = moodSelect.value;
+
+  //3번
+  if (editingId) {
+    updateEntry(editingId, { title, content, mood });
+  } else {
+    addEntry(title, content, mood);
+  }
+
+  //4번
+  clearForm();
+
+  //5번
+  renderAllEntries();
 }
 
 // 7-3. 이벤트 리스너 등록
@@ -217,6 +381,7 @@ function handleSubmit(e) {
 // (Part 1에서 diaryForm을 올바르게 선택해야 동작합니다!)
 if (diaryForm) {
   // TODO: 여기에 addEventListener를 작성하세요
+  diaryForm.addEventListener("submit", handleSubmit);
 }
 
 // ============================================
@@ -239,6 +404,26 @@ function getDiaryStats() {
   // 3. diary를 순회하면서 각 항목의 mood를 키로 사용해 개수를 세세요
   //
   // 힌트: if (moods[mood]) { moods[mood]++ } else { moods[mood] = 1 }
+
+  //2번
+  const moods = {};
+
+  //3번
+  diary.forEach(function (t) {
+    const mood = t.mood;
+    if (moods[mood]) {
+      moods[mood]++;
+    } else {
+      moods[mood] = 1;
+    }
+  });
+
+  return {
+    //1번
+    total: diary.length,
+    //2번
+    moods: moods,
+  };
 }
 
 // 8-2. 통계를 화면에 그리기
@@ -260,6 +445,33 @@ function renderStats() {
   //
   // 힌트: createElement, textContent, appendChild
   // CSS 클래스: 'stats-grid' (컨테이너), 'stat-item' (각 항목), 'stat-total' (전체 개수)
+
+  statsContainer.className = "stats-grid";
+
+  //1번
+  const stats = getDiaryStats();
+  if (!stats) {
+    return;
+  }
+
+  //2번
+  statsContainer.innerHTML = "";
+
+  //3번
+  const totalDiary = document.createElement("div");
+  totalDiary.textContent = `전체 일기: ${stats.total}개`;
+  totalDiary.className = "stat-item stat-total";
+  statsContainer.appendChild(totalDiary);
+
+  //4번
+  for (let mood in stats.moods) {
+    const count = stats.moods[mood];
+
+    const totalMood = document.createElement("div");
+    totalMood.textContent = `${MOOD_EMOJIS[mood]} ${mood}: ${count}개`;
+    totalMood.className = "stat-item";
+    statsContainer.appendChild(totalMood);
+  }
 }
 
 // ============================================
